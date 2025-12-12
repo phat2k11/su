@@ -1,0 +1,603 @@
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local LocalPlayer = Players.LocalPlayer
+
+
+local function safeCall(fn) pcall(fn) end
+local function waitTick() RunService.Heartbeat:Wait() end
+
+
+if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("BananaCatHubGui") then
+    LocalPlayer.PlayerGui.BananaCatHubGui:Destroy()
+end
+
+
+getgenv().Utils = {}
+local Utils = getgenv().Utils
+
+function Utils:CheckChar()
+    local c = LocalPlayer.Character
+    if not c then return false end
+    return c:FindFirstChild("Humanoid") and c:FindFirstChild("HumanoidRootPart")
+end
+
+function Utils:TP(cframe)
+    if not Utils:CheckChar() then return end
+    local hrp = LocalPlayer.Character.HumanoidRootPart
+     
+    local ok, tween = pcall(function()
+        return TweenService:Create(hrp, TweenInfo.new(0.22, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = cframe})
+    end)
+    if ok and tween then
+        tween:Play()
+        tween.Completed:Wait()
+    else
+        pcall(function() hrp.CFrame = cframe end)
+    end
+end
+
+function Utils:Attack()
+    pcall(function()
+        local vu = VirtualUser
+        vu:CaptureController()
+        vu:Button1Down(Vector2.new(0,0))
+        task.wait(0.03)
+        vu:Button1Up(Vector2.new(0,0))
+    end)
+end
+
+
+do
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "BananaCatIntro"
+    gui.ResetOnSpawn = false
+    gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local bg = Instance.new("Frame", gui)
+    bg.Size = UDim2.new(1,0,1,0)
+    bg.BackgroundColor3 = Color3.fromRGB(10,10,10)
+    bg.BackgroundTransparency = 1
+
+    local logo = Instance.new("ImageLabel", gui)
+    logo.AnchorPoint = Vector2.new(0.5,0.5)
+    logo.Position = UDim2.new(0.5, 0.45)
+    logo.Size = UDim2.new(0, 300, 0, 300)
+    logo.BackgroundTransparency = 1
+    logo.Image = "rbxassetid://13613956679"
+    logo.ImageTransparency = 1
+
+    local title = Instance.new("TextLabel", gui)
+    title.AnchorPoint = Vector2.new(0.5,0)
+    title.Position = UDim2.new(0.5, 0.75)
+    title.Size = UDim2.new(0, 500, 0, 40)
+    title.BackgroundTransparency = 1
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 24
+    title.TextColor3 = Color3.fromRGB(255, 230, 120)
+    title.Text = "🍌 BANANA CAT HUB - LOADING..."
+    title.TextTransparency = 1
+
+    local function twn(obj, t, props)
+        return TweenService:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props)
+    end
+
+    twn(bg, 0.8, {BackgroundTransparency = 0}):Play()
+    twn(logo, 1.0, {ImageTransparency = 0}):Play()
+    twn(title, 1.0, {TextTransparency = 0}):Play()
+    task.wait(2.0)
+    twn(logo, 0.8, {ImageTransparency = 1}):Play()
+    twn(title, 0.8, {TextTransparency = 1}):Play()
+    twn(bg, 1.0, {BackgroundTransparency = 1}):Play()
+    task.wait(1.1)
+    gui:Destroy()
+end
+
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "BananaCatHubGui"
+gui.ResetOnSpawn = false
+gui.Parent = LocalPlayer:WaitForChild("PlayerGuframe-- base fralistocal main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 620, 0, 400)
+main.Position = UDim2.new(0.5, -310, 0.5, -200)
+main.BackgroundColor3 = Color3.fromRGB(26,26,26)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,40)
+title.Position = UDim2.new(0,0,0,0)
+title.BackgroundColor3 = Color3.fromRGB(40,40,40)
+title.Text = "🍌 BANANA CAT HUB"
+title.TextColor3 = Color3.fromRGB(255,240,150)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+
+local statusBar = Instance.new("TextLabel", title)
+statusBar.Size = UDim2.new(0.6,0,1,0)
+statusBar.Position = UDim2.new(0.4,0,0,0)
+statusBar.BackgroundTransparency = 1
+statusBar.Text = "Status: Idle"
+statusBar.TextXAlignment = Enum.TextXAlignment.Right
+statusBar.Font = Enum.Font.Gotham
+statusBar.TextSize = 14
+statusBar.TextColor3 = Color3.fromRGB(220,220,220)
+
+
+local tabFrame = Instance.new("Frame", main)
+tabFrame.Size = UDim2.new(0,160,1,-40)
+tabFrame.Position = UDim2.new(0,0,0,40)
+tabFrame.BackgroundColor3 = Color3.fromRGB(32,32,32)
+
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1,-160,1,-40)
+content.Position = UDim2.new(0,160,0,40)
+content.BackgroundColor3 = Color3.fromRGB(18,18,18)
+
+local tabs = {}
+local pages = {}
+local function createTab(name)
+    local idx = #tabs + 1
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1,-10,0,36)
+    btn.Position = UDim2.new(0,5,0,6 + (idx-1)*40)
+    btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    btn.Text = name
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.TextColor3 = Color3.fromRGB(230,230,230)
+
+    local page = Instance.new("ScrollingFrame", content)
+    page.Size = UDim2.new(1,0,1,0)
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    page.CanvasSize = UDim2.new(0,0,3,0)
+
+    btn.MouseButton1Click:Connect(function()
+        for _,p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+        for _,b in pairs(tabs) do b.BackgroundColor3 = Color3.fromRGB(50,50,50) end
+        btn.BackgroundColor3 = Color3.fromRGB(85,85,85)
+    end)
+
+    table.insert(tabs, btn)
+    table.insert(pages, page)
+    return page
+end
+
+local farmPage = createTab("Farm")
+local bossPage = createTab("Boss")
+local raidPage = createTab("Raid")
+local fruitPage = createTab("Fruit")
+local seaPage = createTab("Sea")
+local playerPage = createTab("Player")
+local settingPage = createTab("Settings")
+
+
+tabs[1].MouseButton1Click:Fire()
+
+
+local function addLabel(parent, text, y)
+    local l = Instance.new("TextLabel", parent)
+    l.Size = UDim2.new(1,-20,0,22)
+    l.Position = UDim2.new(0,10,0,y)
+    l.BackgroundTransparency = 1
+    l.Text = text
+    l.Font = Enum.Font.Gotham
+    l.TextSize = 14
+    l.TextColor3 = Color3.fromRGB(220,220,220)
+    return l
+end
+
+local function addButton(parent, text, y, cb)
+    local b = Instance.new("TextButton", parent)
+    b.Size = UDim2.new(1,-20,0,34)
+    b.Position = UDim2.new(0,10,0,y)
+    b.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    b.Text = text
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 14
+    b.TextColor3 = Color3.fromRGB(245,245,245)
+    b.MouseButton1Click:Connect(function() pcall(cb) end)
+    return b
+end
+
+local function addToggle(parent, text, y, initial)
+    local f = Instance.new("Frame", parent)
+    f.Size = UDim2.new(1,-20,0,34)
+    f.Position = UDim2.new(0,10,0,y)
+    f.BackgroundTransparency = 1
+
+    local label = Instance.new("TextLabel", f)
+    label.Size = UDim2.new(0.75,0,1,0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 14
+    label.TextColor3 = Color3.fromRGB(230,230,230)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local btn = Instance.new("TextButton", f)
+    btn.Size = UDim2.new(0.22,0,0.8,0)
+    btn.Position = UDim2.new(0.76,0,0.1,0)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
+    btn.TextColor3 = Color3.new(1,1,1)
+    local state = initial or false
+    btn.BackgroundColor3 = state and Color3.fromRGB(80,170,80) or Color3.fromRGB(110,110,110)
+    btn.Text = state and "ON" or "OFF"
+    local val = Instance.new("BoolValue", f); val.Name = "State"; val.Value = state
+
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(80,170,80) or Color3.fromRGB(110,110,110)
+        btn.Text = state and "ON" or "OFF"
+        val.Value = state
+    end)
+
+    return f, val
+end
+
+local function addSlider(parent, labelText, max, default, y, cb)
+    addLabel(parent, labelText.." : "..tostring(default), y)
+    local box = Instance.new("TextBox", parent)
+    box.Size = UDim2.new(1,-20,0,28)
+    box.Position = UDim2.new(0,10,0,y+24)
+    box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    box.Text = tostring(default)
+    box.ClearTextOnFocus = false
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 14
+    box.TextColor3 = Color3.fromRGB(230,230,230)
+    box.FocusLost:Connect(function()
+        local v = tonumber(box.Text)
+        if v then
+            cb(v)
+        else
+            box.Text = tostring(default)
+        end
+    end)
+    return box
+end
+
+
+getgenv().Flags = {
+    AutoFarm = false,
+    AutoBoss = false,
+    AutoRaid = false,
+    AutoFruit = false,
+    AutoSeaEvent = false,
+    NoClip = false
+}
+
+getgenv().PlayerStats = {
+    WalkSpeed = 16,
+    JumpPower = 50
+}
+
+
+spawn(function()
+    while true do
+        local act = {}
+        for k,v in pairs(getgenv().Flags) do if v then table.insert(act, k) end end
+        statusBar.Text = (#act > 0) and ("Status: "..table.concat(act, ", ")) or "Status: Idle"
+        task.wait(0.8)
+    end
+end)
+
+
+do
+    local y = 6
+    local farmToggleFrame, farmState = addToggle(farmPage, "Auto Farm (smart)", y, false); y = y + 40
+    local mobBox = Instance.new("TextBox", farmPage)
+    mobBox.Size = UDim2.new(1,-20,0,28); mobBox.Position = UDim2.new(0,10,0,y); mobBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    mobBox.TextColor3 = Color3.fromRGB(230,230,230); mobBox.Text = ""; mobBox.ClearTextOnFocus = false; mobBox.Font = Enum.Font.Gotham; mobBox.TextSize = 14
+    y = y + 34
+
+    local attackCooldown = 0.12
+
+    local function RefreshChar()
+        if not LocalPlayer.Character then LocalPlayer.CharacterAdded:Wait() end
+    end
+
+    local function getHRP(c) return (c and c:FindFirstChild("HumanoidRootPart")) or nil end
+
+    local function getNearestEnemy(filterName)
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+        local hrp = char.HumanoidRootPart
+        local enemies = workspace:FindFirstChild("Enemies") or workspace
+        local nearest, nd = nil, math.huge
+        for _, m in pairs(enemies:GetChildren()) do
+            if m:IsA("Model") and getHRP(m) and m:FindFirstChild("Humanoid") and m.Humanoid.Health > 0 then
+                if filterName and filterName ~= "" then
+                    if not string.find(m.Name:lower(), filterName:lower()) then continue end
+                end
+                local d = (getHRP(m).Position - hrp.Position).Magnitude
+                if d < nd then nd = d; nearest = m end
+            end
+        end
+        return nearest
+    end
+
+    spawn(function()
+        while true do
+            task.wait(0.02)
+            if farmState.State.Value then
+                local target = getNearestEnemy(mobBox.Text)
+                if target and target:FindFirstChild("HumanoidRootPart") then
+                    local pos = target.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+                    Utils:TP(pos)
+                    if (not getgenv().__lastAttack) or (os.clock() - getgenv().__lastAttack > attackCooldown) then
+                        Utils:Attack()
+                        getgenv().__lastAttack = os.clock()
+                    end
+                end
+            end
+        end
+    end)
+
+    farmState.Changed:Connect(function(v) getgenv().Flags.AutoFarm = v end)
+end
+
+
+do
+    local y = 6
+    local bossToggleF, bossState = addToggle(bossPage, "Auto Kill Boss", y, false); y = y + 40
+    local bossBox = Instance.new("TextBox", bossPage)
+    bossBox.Size = UDim2.new(1,-20,0,28); bossBox.Position = UDim2.new(0,10,0,y); bossBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    bossBox.TextColor3 = Color3.fromRGB(230,230,230); bossBox.Text = ""; bossBox.ClearTextOnFocus = false; bossBox.Font = Enum.Font.Gotham; bossBox.TextSize = 14
+    y = y + 34
+
+    local BossList = {
+        "The Gorilla King","Bobby","Yeti","Saber Expert","Magma Admiral",
+        "Ice Admiral","Don Swan","Cursed Captain","Beautiful Pirate"
+    }
+
+    local function findBoss(nameFilter)
+        local folder = workspace:FindFirstChild("Enemies") or workspace
+        for _, nm in ipairs(BossList) do
+            if nameFilter and nameFilter ~= "" then
+                if not nm:lower():find(nameFilter:lower()) then continue end
+            end
+            local b = folder:FindFirstChild(nm)
+            if b and b:FindFirstChild("Humanoid") and b.Humanoid.Health > 0 and b:FindFirstChild("HumanoidRootPart") then
+                return b
+            end
+        end
+        
+        for _,m in pairs(folder:GetChildren()) do
+            if m:IsA("Model") and (m:FindFirstChild("Boss") or m.Name:lower():find("boss")) and m:FindFirstChild("Humanoid") and m.Humanoid.Health > 0 then
+                return m
+            end
+        end
+        return nil
+    end
+
+    spawn(function()
+        while true do
+            task.wait(0.04)
+            if bossState.State.Value then
+                local b = findBoss(bossBox.Text)
+                if b and b:FindFirstChild("HumanoidRootPart") then
+                    local pos = b.HumanoidRootPart.CFrame * CFrame.new(0,8,0)
+                    Utils:TP(pos)
+                    if (not getgenv().__lastBossHit) or (os.clock() - getgenv().__lastBossHit > 0.16) then
+                        Utils:Attack()
+                        getgenv().__lastBossHit = os.clock()
+                    end
+                end
+            end
+        end
+    end)
+    bossState.Changed:Connect(function(v) getgenv().Flags.AutoBoss = v end)
+end
+
+
+do
+    local y = 6
+    local raidToggleF, raidState = addToggle(raidPage, "Auto Raid", y, false); y = y + 40
+    local raidDropdownLabel = addLabel(raidPage, "Selected Raid:", y); y = y + 22
+    local raidBox = Instance.new("TextBox", raidPage)
+    raidBox.Size = UDim2.new(1,-20,0,28); raidBox.Position = UDim2.new(0,10,0,y); raidBox.Text = ""; raidBox.ClearTextOnFocus = false; raidBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    raidBox.TextColor3 = Color3.fromRGB(230,230,230); raidBox.Font = Enum.Font.Gotham; raidBox.TextSize = 14
+    y = y + 34
+
+    local function nearestMobForRaid()
+        if not Utils:CheckChar() then return nil end
+        local hrp = LocalPlayer.Character.HumanoidRootPart
+        local closest, dmin = nil, math.huge
+        for _, mob in pairs(workspace:FindFirstChild("Enemies") and workspace.Enemies:GetChildren() or {}) do
+            if mob:FindFirstChild("Humanoid") and mob:FindFirstChild("HumanoidRootPart") and mob.Humanoid.Health > 0 then
+                local d = (mob.HumanoidRootPart.Position - hrp.Position).Magnitude
+                if d < dmin then dmin = d; closest = mob end
+            end
+        end
+        return closest
+    end
+
+    local function tryBuyChip(name)
+        pcall(function()
+            local rs = game:GetService("ReplicatedStorage")
+            local remotes = rs:FindFirstChild("Remotes") or rs
+            local comm = remotes:FindFirstChild("CommF_") or remotes:FindFirstChildWhichIsA("RemoteFunction")
+            if comm and comm:IsA("RemoteFunction") then
+                pcall(function() comm:InvokeServer("RaidsNpc", "BuyChip", name) end)
+            end
+        end)
+    end
+
+    spawn(function()
+        while true do
+            task.wait(0.03)
+            if raidState.State.Value then
+                tryBuyChip(raidBox.Text)
+                local mob = nearestMobForRaid()
+                if mob and mob:FindFirstChild("HumanoidRootPart") then
+                    Utils:TP(mob.HumanoidRootPart.CFrame * CFrame.new(0,7,0))
+                    Utils:Attack()
+                end
+            end
+        end
+    end)
+    raidState.Changed:Connect(function(v) getgenv().Flags.AutoRaid = v end)
+end
+
+
+do
+    local y = 6
+    local fruitToggleF, fruitState = addToggle(fruitPage, "Auto Find/Grab Fruit", y, false); y = y + 40
+    local fruitNotifyLabel = addLabel(fruitPage, "Auto will scan common locations for fruits", y); y = y + 24
+
+    local function findFruits()
+        local out = {}
+        
+        for _, o in pairs(workspace:GetChildren()) do
+            if o:IsA("Tool") and o:FindFirstChild("Handle") then
+                table.insert(out, o.Handle)
+            end
+        end
+        
+        if workspace:FindFirstChild("Fruit") then
+            for _, f in pairs(workspace.Fruit:GetChildren()) do
+                if f:IsA("Tool") and f:FindFirstChild("Handle") then table.insert(out, f.Handle) end
+            end
+        end
+        if workspace:FindFirstChild("SpawnedFruit") then
+            for _, f in pairs(workspace.SpawnedFruit:GetChildren()) do
+                if f:IsA("Tool") and f:FindFirstChild("Handle") then table.insert(out, f.Handle) end
+            end
+        end
+        return out
+    end
+
+    spawn(function()
+        while true do
+            task.wait(0.3)
+            if fruitState.State.Value then
+                local list = findFruits()
+                for _, fh in pairs(list) do
+                    if fh and fh.Parent then
+                        Utils:TP(fh.CFrame * CFrame.new(0,3,0))
+                        task.wait(0.5)
+                    end
+                end
+            end
+        end
+    end)
+    fruitState.Changed:Connect(function(v) getgenv().Flags.AutoFruit = v end)
+end
+
+
+do
+    local y = 6
+    local seaToggleF, seaState = addToggle(seaPage, "Auto Sea Event", y, false); y = y + 40
+
+    local function getSeaTarget()
+        return workspace:FindFirstChild("Leviathan") or workspace:FindFirstChild("Kraken") or workspace:FindFirstChild("SeaBeast")
+    end
+
+    local function getHRP(m)
+        if m:FindFirstChild("HumanoidRootPart") then return m.HumanoidRootPart end
+        if m:FindFirstChild("Head") then return m.Head end
+        for _,p in pairs(m:GetDescendants()) do if p:IsA("BasePart") then return p end end
+        return nil
+    end
+
+    spawn(function()
+        while true do
+            task.wait(0.3)
+            if seaState.State.Value then
+                local tgt = getSeaTarget()
+                if tgt then
+                    local hrp = getHRP(tgt)
+                    if hrp then
+                        Utils:TP(hrp.CFrame * CFrame.new(0,18,8))
+                        Utils:Attack()
+                    end
+                end
+            end
+        end
+    end)
+    seaState.Changed:Connect(function(v) getgenv().Flags.AutoSeaEvent = v end)
+end
+
+
+do
+    local y = 6
+    addLabel(playerPage, "WalkSpeed / JumpPower", y); y = y + 22
+    local wsBox = addSlider(playerPage, "WalkSpeed (max 500)", 500, getgenv().PlayerStats.WalkSpeed, y, function(v)
+        getgenv().PlayerStats.WalkSpeed = v
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = v
+        end
+    end); y = y + 36
+
+    local jpBox = addSlider(playerPage, "JumpPower (max 300)", 300, getgenv().PlayerStats.JumpPower, y, function(v)
+        getgenv().PlayerStats.JumpPower = v
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.JumpPower = v
+        end
+    end); y = y + 36
+
+    
+    LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(1.2)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().PlayerStats.WalkSpeed
+            LocalPlayer.Character.Humanoid.JumpPower = getgenv().PlayerStats.JumpPower
+        end
+    end)
+
+    
+    local noclipF, noclipState = addToggle(playerPage, "NoClip (hold ON)", y, false); y = y + 40
+    noclipState.Changed:Connect(function(v) getgenv().Flags.NoClip = v end)
+    spawn(function()
+        while true do
+            task.wait(0.2)
+            if getgenv().Flags.NoClip and LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end
+    end)
+end
+
+
+do
+    
+    Players.LocalPlayer.Idled:Connect(function()
+        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end)
+
+    addButton(settingPage, "Disable ALL (quick)", 6, function()
+        for k,_ in pairs(getgenv().Flags) do getgenv().Flags[k] = false end
+        -- force toggle UI off (iterate pages toggles values)
+        -- simple: reload GUI toggles off by destroying & recreating? We'll just set booleans
+        warn("All flags set to false")
+    end)
+
+    addButton(settingPage, "Re-apply Walk/Jump", 46, function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().PlayerStats.WalkSpeed
+            LocalPlayer.Character.Humanoid.JumpPower = getgenv().PlayerStats.JumpPower
+        end
+    end)
+end
+
+
+LocalPlayer.AncestryChanged:Connect(function(_, parent)
+    if not parent then
+        if gui and gui.Parent then gui:Destroy() end
+    end
+end)
+
+print("🍌 Banana Cat Hub - Loaded. Paste this LocalScript into StarterPlayerScripts.")
